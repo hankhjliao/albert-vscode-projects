@@ -39,7 +39,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## Contact
 
-Project Link: [https://github.com/hankliao87/albert-vscode-projects](https://github.com/hankliao87/albert-vscode-projects)
+Project Link: [https://github.com/hankliao87/albert-vscode-projects](https://github.com/hankliao87/albert-vscode-projects)  
 Base on: https://github.com/mqus/jetbrains-albert-plugin and https://github.com/Sharsie/albertlauncher-vscode-projects
 
 ## Acknowledgements
