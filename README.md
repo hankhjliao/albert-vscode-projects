@@ -45,6 +45,7 @@ Base on: https://github.com/mqus/jetbrains-albert-plugin and https://github.com/
 ## Acknowledgements
 - https://github.com/mqus/jetbrains-albert-plugin
 - https://github.com/Sharsie/albertlauncher-vscode-projects
+- https://github.com/plibither8/ulauncher-vscode-recent
 - [Project Manager extension](https://marketplace.visualstudio.com/items?itemName=alefragnani.project-manager)
 - VS Code logo used based on the [brand guidelines](https://code.visualstudio.com/brand)
 - [Best README Template](https://github.com/othneildrew/Best-README-Template)
