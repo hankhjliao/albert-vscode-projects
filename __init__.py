@@ -1,143 +1,169 @@
 # -*- coding: utf-8 -*-
-
-"""List and open VSCode projects based on recently opened paths."""
+"""List and open VSCode projects and recently opened directories."""
 
 import os
 import json
 import unicodedata
 
+from typing import *
 from albert import *
-
 
 __title__ = "VS Code Projects"
 __version__ = "0.4.0"
 __triggers__ = "vc "
-__author__ = "Sharsie"
+__authors__ = ["Sharsie", "hankliao87"]
+__py_deps__ = ["sqlite3"]
+
+import sqlite3
 
 default_icon = os.path.dirname(__file__) + "/vscode.svg"
-HOME_DIR = os.environ["HOME"]
 
-# User/sync/globalState/lastSyncglobalState.json
+HOME_DIR = os.environ["HOME"]
+EXEC = '/usr/bin/code'
+VARIANT = 'Code'
+
+# Recent paths for VSCode versions after 1.64
+# :uri https://code.visualstudio.com/updates/v1_64
+# Path to the vscode database file where recent paths can be queried
+STORAGE_DB_XDG_CONFIG_DIR = os.path.join(
+    HOME_DIR,
+    ".config", VARIANT, "User/globalStorage/state.vscdb"
+)
+# Recent paths for VSCode versions before 1.64
 # Path to the vscode storage json file where recent paths can be queried
 STORAGE_DIR_XDG_CONFIG_DIRS = [
-    os.path.join(HOME_DIR, ".config/Code/storage.json"),
-    os.path.join(HOME_DIR, ".config/Code/User/globalStorage/storage.json"),
+    os.path.join(HOME_DIR, ".config", VARIANT, "storage.json"),
+    os.path.join(HOME_DIR, ".config", VARIANT,
+                 "User/globalStorage/storage.json"),
 ]
 
 # Path to the Project Manager plugin configuration
 PROJECT_MANAGER_XDG_CONFIG_DIR = os.path.join(
     HOME_DIR,
-    ".config/Code/User/globalStorage/alefragnani.project-manager/projects.json"
+    ".config", VARIANT, "User/globalStorage/alefragnani.project-manager/projects.json"
 )
 
-# If Project Manager is installed, you can disable recent projects by switching
-# the following variable to True
-INCLUDE_RECENT = True
 
-# Sort order of the Project Manager entries (match by Name)
-ORDER_PM_NAME = 0
-# Sort order of the Project Manager entries (match by Path)
-ORDER_PM_PATH = 0
-# Sort order of the Project Manager entries (match by Tags)
-ORDER_PM_TAG = 100
-# Sort order of the recently opened paths in VSCode
-ORDER_RECENT = 200
-
-# Normalizes search string (accents and whatnot)
-
-
-def normalizeString(input):
+def normalizeString(input: str) -> str:
+    """
+    Normalizes search string (accents and whatnot)
+    """
     return ''.join(c for c in unicodedata.normalize('NFD', input)
                    if unicodedata.category(c) != 'Mn').lower()
 
-# Helper method to create project entry from various sources
+
+def addProjectEntry(uri: str, index=0, tags=[]) -> None:
+    """
+    Helper function to add project entry from various sources
+    """
+    global projects
+    global queryString
+
+    # For remote machine ("vscode-remote://ssh-remote+<hostname>/...")
+    if uri.startswith('vscode-remote://ssh-remote%2B'):
+        # Remove uri string
+        path = uri.replace('vscode-remote://ssh-remote%2B', '', 1)
+
+        # Split hostname and file path
+        hostname, path = path.split('/', 1)
+        path = '/' + path
+
+        descrip = f'[{hostname}] {path}'
+        cmd = ['--remote', f'ssh-remote+{hostname}', path]
+
+    # For local directory ("file://..." or "/...")
+    elif uri.startswith('file://') or uri.startswith('/'):
+        # Remove uri string
+        path = uri.replace('file://', '', 1)
+
+        # Check directory exist
+        if not os.path.exists(path):
+            return
+
+        descrip = path
+        cmd = [path]
+
+    else:
+        return
+
+    name = path.split("/")[-1]
+
+    # Normalize the directory in which the project resides
+    nameNormalized = normalizeString(name)
+    descripNormalized = normalizeString(descrip)
+    tagsNormalized = normalizeString(' '.join(tags))
+
+    # Compare the normalized dir with user query
+    queryList = [nameNormalized, descripNormalized, tagsNormalized]
+    if any([i.find(queryString) != -1 for i in queryList]):
+        projects[descrip] = {
+            'name': name,
+            'descrip': descrip,
+            'cmd': cmd,
+            'index': '{0:04d}'.format(index),  # Zeropad for easy sorting
+        }
 
 
-def createProjectEntry(name, path, index, secondary_index):
-    return {
-        'name': name,
-        'path': path,
-        # Zeropad for easy sorting
-        'index': '{0:04d}'.format(index),
-        # Secondary index is used for sorting based on recently opened path order
-        'index_secondary': '{0:04d}'.format(secondary_index),
-    }
-
-# The entry point for the plugin, will be called by albert.
-
-
-def handleQuery(query):
-    print("query.string")
+def handleQuery(query: str) -> Optional[List[Item]]:
     if query.isTriggered:
         # Create projects dictionary to store projects by paths
+        global projects
         projects = {}
 
         # Normalize user query
-        normalizedQueryString = normalizeString(query.string)
+        global queryString
+        queryString = normalizeString(query.string)
 
+        # Use incremental index for sorting which will keep the projects
+        # sorted from least recent to oldest one
+        sortIndex = 1
+
+        # Recent paths for Visual Studio Code versions after 1.64
+        if os.path.exists(STORAGE_DB_XDG_CONFIG_DIR):
+            con = sqlite3.connect(STORAGE_DB_XDG_CONFIG_DIR)
+            cur = con.cursor()
+            cur.execute(
+                'SELECT value FROM ItemTable WHERE key = "history.recentlyOpenedPathsList"')
+            json_code, = cur.fetchone()
+            paths_list = json.loads(json_code)
+
+            for item in paths_list['entries']:
+                uri = item.get('folderUri', '')
+
+                # Add project entry
+                addProjectEntry(uri=uri, index=sortIndex)
+                sortIndex += 1
+
+        # Recent paths for Visual Studio Code versions before 1.64
         for storageFile in STORAGE_DIR_XDG_CONFIG_DIRS:
-            # No vscode storage file
             if os.path.exists(storageFile):
                 with open(storageFile) as configFile:
                     # Load the storage json
                     storageConfig = json.loads(configFile.read())
 
-                    if (
-                        INCLUDE_RECENT == True
-                        and "lastKnownMenubarData" in storageConfig
-                        and "menus" in storageConfig['lastKnownMenubarData']
-                        and "File" in storageConfig['lastKnownMenubarData']['menus']
-                        and "items" in storageConfig['lastKnownMenubarData']['menus']['File']
-                    ):
-                        # Use incremental index for sorting which will keep the projects
-                        # sorted from least recent to oldest one
-                        sortIndex = ORDER_RECENT + 1
+                    # These are all the menu items in "File" dropdown
+                    for menuItem in storageConfig.get('lastKnownMenubarData', {}).get('menus', {}).get('File', {}).get('items', []):
+                        if menuItem.get('label', '') != 'Open &&Recent':
+                            continue
 
-                        # These are all the menu items in File dropdown
-                        for menuItem in storageConfig['lastKnownMenubarData']['menus']['File']['items']:
-                            # Cannot safely detect proper menu item, as menu item IDs change over time
-                            # Instead we will search all submenus and check for IDs inside the submenu items
+                        # Get the item in the "Open &&Recent"
+                        for submenuItem in menuItem.get('submenu', {}).get('items', []):
+                            # Check of submenu item with id "openRecentFolder" and make sure it is enabled
                             if (
-                                not "id" in menuItem
-                                or not "submenu" in menuItem
-                                or not "items" in menuItem['submenu']
+                                submenuItem.get('id', '') != "openRecentFolder"
+                                or submenuItem.get('enabled', False) == False
                             ):
                                 continue
 
-                            for submenuItem in menuItem['submenu']['items']:
-                                # Check of submenu item with id "openRecentFolder" and make sure it contains necessarry keys
-                                if (
-                                    not "id" in submenuItem
-                                    or submenuItem['id'] != "openRecentFolder"
-                                    or not "enabled" in submenuItem
-                                    or submenuItem['enabled'] != True
-                                    or not "label" in submenuItem
-                                    or not "uri" in submenuItem
-                                    or not "path" in submenuItem['uri']
-                                ):
-                                    continue
+                            uri = submenuItem.get(
+                                'uri', {}).get('external', '')
+                            if uri == '':
+                                uri = submenuItem.get(
+                                    'uri', {}).get('path', '')
 
-                                # Get the full path to the project
-                                recentPath = submenuItem['uri']['path']
-                                if not os.path.exists(recentPath):
-                                    continue
-
-                                # Normalize the directory in which the project resides
-                                normalizedDir = normalizeString(
-                                    recentPath.split("/")[-1])
-                                normalizedLabel = normalizeString(submenuItem['label'])
-
-                                # Compare the normalized dir with user query
-                                if (
-                                    normalizedDir.find(normalizedQueryString) != -1
-                                    or normalizedLabel.find(normalizedQueryString) != -1
-                                ):
-                                    # Inject the project
-                                    projects[recentPath] = createProjectEntry(
-                                        normalizedDir, recentPath, ORDER_RECENT, sortIndex)
-                                    # Increment the sort index
-                                    sortIndex += 1
-
+                            # Add project entry
+                            addProjectEntry(uri=uri, index=sortIndex)
+                            sortIndex += 1
 
         # Check whether the Project Manager config file exists
         if os.path.exists(PROJECT_MANAGER_XDG_CONFIG_DIR):
@@ -146,77 +172,43 @@ def handleQuery(query):
 
                 for project in configuredProjects:
                     # Make sure we have necessarry keys
-                    if (
-                        not "rootPath" in project
-                        or not "name" in project
-                        or not "enabled" in project
-                        or project['enabled'] != True
-                    ):
+                    if not project.get('enabled', False):
                         continue
 
                     # Grab the path to the project
-                    rootPath = project['rootPath']
-                    if not os.path.exists(rootPath):
-                        continue
+                    uri = project.get('rootPath', '')
 
-                    # Normalize name and dir of the project
-                    normalizedName = normalizeString(project['name'])
-                    normalizedDir = normalizeString(
-                        rootPath.split("/")[-1])
-
-                    found = False
-                    orderIndex = 0
-
-                    # Search against the query string
-                    if normalizedName.find(normalizedQueryString) != -1:
-                        orderIndex = ORDER_PM_NAME
-                        found = True
-                    elif normalizedDir.find(normalizedQueryString) != -1:
-                        orderIndex = ORDER_PM_PATH
-                        found = True
-                    elif "tags" in project:
-                        for tag in project['tags']:
-                            if normalizeString(tag).find(normalizedQueryString) != -1:
-                                orderIndex = ORDER_PM_TAG
-                                found = True
-                                break
-
-                    if found:
-                        projects[rootPath] = createProjectEntry(
-                            project['name'],
-                            rootPath,
-                            orderIndex,
-                            # Secondary index is zero, because we will sort the rest by project name
-                            0
-                        )
-
-        # Array of Items we will return to albert launcher
-        items = []
+                    # Add project entry
+                    addProjectEntry(
+                        uri=uri, tags=project.get('tags', []))
 
         # disable automatic sorting
         query.disableSort()
 
         # Sort projects by indexes
         sorted_project_items = sorted(projects.items(), key=lambda item: "%s_%s_%s" % (
-            item[1]['index'], item[1]['index_secondary'], item[1]['name']), reverse=False)
+            item[1]['index'], item[1]['name'], item[1]['descrip']), reverse=False)
 
+        # Array of Items we will return to albert launcher
+        items = []
         for item in sorted_project_items:
             project = item[1]
             name = project['name']
-            path = project['path']
-            output_entry = Item(
-                id="%s_%s" % (path, name),
+            descrip = project['descrip']
+            cmd = [EXEC] + project['cmd']
+
+            item = Item(
+                id="%s" % (descrip),
                 icon=default_icon,
                 text=name,
-                subtext=path,
+                subtext=descrip,
                 completion=__triggers__ + name,
                 actions=[
                     ProcAction(text="Open in VSCode",
-                               commandline=["code", path],
-                               cwd=path)
+                               commandline=cmd)
                 ]
             )
 
-            items.append(output_entry)
+            items.append(item)
 
         return items
