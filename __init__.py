@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""List and open VSCode projects and recently opened directories."""
+"""List and open VS Code projects and recently opened directories."""
 
 import os
 import json
@@ -22,15 +22,15 @@ HOME_DIR = os.environ["HOME"]
 EXEC = '/usr/bin/code'
 VARIANT = 'Code'
 
-# Recent paths for VSCode versions after 1.64
+# Recent paths for VS Code versions after 1.64
 # :uri https://code.visualstudio.com/updates/v1_64
-# Path to the vscode database file where recent paths can be queried
+# Path to the VS Code database file where recent paths can be queried
 STORAGE_DB_XDG_CONFIG_DIR = os.path.join(
     HOME_DIR,
     ".config", VARIANT, "User/globalStorage/state.vscdb"
 )
-# Recent paths for VSCode versions before 1.64
-# Path to the vscode storage json file where recent paths can be queried
+# Recent paths for VS Code versions before 1.64
+# Path to the VS Code storage json file where recent paths can be queried
 STORAGE_DIR_XDG_CONFIG_DIRS = [
     os.path.join(HOME_DIR, ".config", VARIANT, "storage.json"),
     os.path.join(HOME_DIR, ".config", VARIANT,
@@ -204,7 +204,7 @@ def handleQuery(query: str) -> Optional[List[Item]]:
                 subtext=descrip,
                 completion=__triggers__ + name,
                 actions=[
-                    ProcAction(text="Open in VSCode",
+                    ProcAction(text="Open in VS Code",
                                commandline=cmd)
                 ]
             )
