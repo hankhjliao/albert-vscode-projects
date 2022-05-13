@@ -1,29 +1,50 @@
-# Albert launcher plugin for Visual Studio Code
+<p align="center">
+<h3 align="center">Albert Plugin: VS Code Projects</h3>
 
-Based on https://github.com/mqus/jetbrains-albert-plugin
+<p align="center">
+<a href="https://github.com/hankliao87/albert-vscode-projects/graphs/contributors">
+<img src="https://img.shields.io/github/contributors/hankliao87/albert-vscode-projects.svg?style=flat-square" alt=""></a>
+<a href="https://github.com/hankliao87/albert-vscode-projects/network/members">
+<img src="https://img.shields.io/github/forks/hankliao87/albert-vscode-projects.svg?style=flat-square" alt=""></a>
+<a href="https://github.com/hankliao87/albert-vscode-projects/stargazers">
+<img src="https://img.shields.io/github/stars/hankliao87/albert-vscode-projects.svg?style=flat-square" alt=""></a>
+<a href="https://github.com/hankliao87/albert-vscode-projects/issues">
+<img src="https://img.shields.io/github/issues/hankliao87/albert-vscode-projects.svg?style=flat-square" alt=""></a>
+<a href="https://github.com/hankliao87/albert-vscode-projects/blob/master/LICENSE.txt">
+<img src="https://img.shields.io/github/license/hankliao87/albert-vscode-projects.svg?style=flat-square" alt=""></a>
+</p>
 
-This is a plugin for the [albert launcher](https://albertlauncher.github.io/) which lists and lets you start projects of VS Code IDE
+</p>
 
-Supports listing of recently opened paths and integrates with [Project Manager extension](https://marketplace.visualstudio.com/items?itemName=alefragnani.project-manager)
+## Getting Started
 
-Sorting is based on
-1) If query matches on either path or name of a Project Manager entry, it will be sorted first and then alphabetically by name
-2) If query matches on the tag of Project Manager entry, it will be sorted second and then alphabetically by name
-3) Last come recently opened paths in VS Code sorted in the same way as they are shown in VS Code File -> Open Recent
+1. Install VS Code.
 
-## How to install
-Copy contents of this directory to ${XDG_DATA_HOME:-$HOME/.local/share}/albert/org.albert.extension.python/modules/vscode-projects
+2. Clone this repository to `~/.local/share/albert/org.albert.extension.python/modules`:
+   ```
+   git clone https://github.com/hankliao87/albert-vscode-projects.git $HOME/.local/share/albert/org.albert.extension.python/modules/albert-vscode-projects
+   ```
 
-## How to use
-Start by typing `vc `. If you have any recently opened paths you should immediately see the latest ones at the top.
+3. Enable `VS Code Projects` plugin in `albert settings - Extensions - Python`
 
-## Project Manager
-If you have PM extension installed the search is performed against the rootPath of the project, its name and its tags.
+## Usage
 
-## Disclaimer
+`vc <expression>`
 
-Not a python guy, this plugin was scripted together with my buddy ol' pal uncle Google. Like... Entirely.
+## Known Issues
 
-I am in no way affiliated with VS Code or Microsoft.
+## License
 
-VS Code logo used based on the [brand guidelines](https://code.visualstudio.com/brand).
+Distributed under the MIT License. See `LICENSE` for more information.
+
+## Contact
+
+Project Link: [https://github.com/hankliao87/albert-vscode-projects](https://github.com/hankliao87/albert-vscode-projects)
+Base on: https://github.com/mqus/jetbrains-albert-plugin and https://github.com/Sharsie/albertlauncher-vscode-projects
+
+## Acknowledgements
+- https://github.com/mqus/jetbrains-albert-plugin
+- https://github.com/Sharsie/albertlauncher-vscode-projects
+- [Project Manager extension](https://marketplace.visualstudio.com/items?itemName=alefragnani.project-manager)
+- VS Code logo used based on the [brand guidelines](https://code.visualstudio.com/brand)
+- [Best README Template](https://github.com/othneildrew/Best-README-Template)
