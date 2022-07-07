@@ -135,35 +135,36 @@ def handleQuery(query: str) -> Optional[List[Item]]:
                 sortIndex += 1
 
         # Recent paths for Visual Studio Code versions before 1.64
-        for storageFile in STORAGE_DIR_XDG_CONFIG_DIRS:
-            if os.path.exists(storageFile):
-                with open(storageFile) as configFile:
-                    # Load the storage json
-                    storageConfig = json.loads(configFile.read())
+        else:
+            for storageFile in STORAGE_DIR_XDG_CONFIG_DIRS:
+                if os.path.exists(storageFile):
+                    with open(storageFile) as configFile:
+                        # Load the storage json
+                        storageConfig = json.loads(configFile.read())
 
-                    # These are all the menu items in "File" dropdown
-                    for menuItem in storageConfig.get('lastKnownMenubarData', {}).get('menus', {}).get('File', {}).get('items', []):
-                        if menuItem.get('label', '') != 'Open &&Recent':
-                            continue
-
-                        # Get the item in the "Open &&Recent"
-                        for submenuItem in menuItem.get('submenu', {}).get('items', []):
-                            # Check of submenu item with id "openRecentFolder" and make sure it is enabled
-                            if (
-                                submenuItem.get('id', '') != "openRecentFolder"
-                                or submenuItem.get('enabled', False) == False
-                            ):
+                        # These are all the menu items in "File" dropdown
+                        for menuItem in storageConfig.get('lastKnownMenubarData', {}).get('menus', {}).get('File', {}).get('items', []):
+                            if menuItem.get('label', '') != 'Open &&Recent':
                                 continue
 
-                            uri = submenuItem.get(
-                                'uri', {}).get('external', '')
-                            if uri == '':
-                                uri = submenuItem.get(
-                                    'uri', {}).get('path', '')
+                            # Get the item in the "Open &&Recent"
+                            for submenuItem in menuItem.get('submenu', {}).get('items', []):
+                                # Check of submenu item with id "openRecentFolder" and make sure it is enabled
+                                if (
+                                    submenuItem.get('id', '') != "openRecentFolder"
+                                    or submenuItem.get('enabled', False) == False
+                                ):
+                                    continue
 
-                            # Add project entry
-                            addProjectEntry(uri=uri, index=sortIndex)
-                            sortIndex += 1
+                                uri = submenuItem.get(
+                                    'uri', {}).get('external', '')
+                                if uri == '':
+                                    uri = submenuItem.get(
+                                        'uri', {}).get('path', '')
+
+                                # Add project entry
+                                addProjectEntry(uri=uri, index=sortIndex)
+                                sortIndex += 1
 
         # Check whether the Project Manager config file exists
         if os.path.exists(PROJECT_MANAGER_XDG_CONFIG_DIR):
