@@ -22,7 +22,7 @@
 
 2. Clone this repository to `~/.local/share/albert/org.albert.extension.python/modules`:
    ```
-   git clone https://github.com/hankliao87/albert-vscode-projects.git $HOME/.local/share/albert/org.albert.extension.python/modules/albert-vscode-projects
+   git clone https://github.com/hankliao87/albert-vscode-projects.git $HOME/.local/share/albert/python/plugins/albert-vscode-projects
    ```
 
 3. Enable `VS Code Projects` plugin in `albert settings - Extensions - Python`
