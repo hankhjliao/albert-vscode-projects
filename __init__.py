@@ -120,7 +120,7 @@ class Plugin(QueryHandler):
         return md_description
 
     def synopsis(self) -> str:
-        return "<expression>"
+        return "<filter>"
 
     def defaultTrigger(self) -> str:
         return trigger
