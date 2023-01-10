@@ -8,15 +8,20 @@ import unicodedata
 from typing import *
 from albert import *
 
-__title__ = "VS Code Projects"
-__version__ = "0.4.0"
-__triggers__ = "vc "
-__authors__ = ["Sharsie", "hankliao87"]
-__py_deps__ = ["sqlite3"]
+md_iid = "0.5"
+md_version = "0.1"
+md_name = "Open VS Code Projects"
+md_description = "List and open VS Code projects and recently opened directories."
+md_license = "MIT"
+md_url = "https://github.com/hankliao87/albert-vscode-projects"
+md_maintainers = "@hankliao87"
+md_bin_dependencies = ["sqlite3"]
+
+trigger = "vc "
 
 import sqlite3
 
-default_icon = os.path.dirname(__file__) + "/vscode.svg"
+default_icon = [os.path.dirname(__file__) + "/vscode.svg"]
 
 HOME_DIR = os.environ["HOME"]
 EXEC = '/usr/bin/code'
@@ -104,8 +109,23 @@ def addProjectEntry(uri: str, index=0, tags=[]) -> None:
         }
 
 
-def handleQuery(query: str) -> Optional[List[Item]]:
-    if query.isTriggered:
+class Plugin(QueryHandler):
+    def id(self) -> str:
+        return __name__
+
+    def name(self) -> str:
+        return md_name
+
+    def description(self) -> str:
+        return md_description
+
+    def synopsis(self) -> str:
+        return "<expression>"
+
+    def defaultTrigger(self) -> str:
+        return trigger
+
+    def handleQuery(self, query: str) -> None:
         # Create projects dictionary to store projects by paths
         global projects
         projects = {}
@@ -183,15 +203,11 @@ def handleQuery(query: str) -> Optional[List[Item]]:
                     addProjectEntry(
                         uri=uri, tags=project.get('tags', []))
 
-        # disable automatic sorting
-        query.disableSort()
-
         # Sort projects by indexes
         sorted_project_items = sorted(projects.items(), key=lambda item: "%s_%s_%s" % (
             item[1]['index'], item[1]['name'], item[1]['descrip']), reverse=False)
 
         # Array of Items we will return to albert launcher
-        items = []
         for item in sorted_project_items:
             project = item[1]
             name = project['name']
@@ -203,13 +219,12 @@ def handleQuery(query: str) -> Optional[List[Item]]:
                 icon=default_icon,
                 text=name,
                 subtext=descrip,
-                completion=__triggers__ + name,
                 actions=[
-                    ProcAction(text="Open in VS Code",
-                               commandline=cmd)
+                    Action(
+                        id="open",
+                        text="Open in VS Code",
+                        callable=lambda u=cmd: runDetachedProcess(u))
                 ]
             )
 
-            items.append(item)
-
-        return items
+            query.add(item)
