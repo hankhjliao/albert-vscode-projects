@@ -20,12 +20,12 @@
 
 1. Install VS Code.
 
-2. Clone this repository to `~/.local/share/albert/org.albert.extension.python/modules`:
+2. Clone this repository to `~/.local/share/albert/python/plugins`:
    ```
    git clone https://github.com/hankliao87/albert-vscode-projects.git $HOME/.local/share/albert/python/plugins/albert-vscode-projects
    ```
 
-3. Enable `VS Code Projects` plugin in `albert settings - Extensions - Python`
+3. Enable `VS Code Projects` plugin in `albert settings - Plugins - Python`
 
 ## Usage
 
