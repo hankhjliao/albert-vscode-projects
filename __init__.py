@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-"""List and open VS Code projects and recently opened directories."""
 
 import os
 import json
