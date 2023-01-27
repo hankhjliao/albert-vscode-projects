@@ -2,16 +2,16 @@
 <h3 align="center">Albert Plugin: VS Code Projects</h3>
 
 <p align="center">
-<a href="https://github.com/hankliao87/albert-vscode-projects/graphs/contributors">
-<img src="https://img.shields.io/github/contributors/hankliao87/albert-vscode-projects.svg?style=flat-square" alt=""></a>
-<a href="https://github.com/hankliao87/albert-vscode-projects/network/members">
-<img src="https://img.shields.io/github/forks/hankliao87/albert-vscode-projects.svg?style=flat-square" alt=""></a>
-<a href="https://github.com/hankliao87/albert-vscode-projects/stargazers">
-<img src="https://img.shields.io/github/stars/hankliao87/albert-vscode-projects.svg?style=flat-square" alt=""></a>
-<a href="https://github.com/hankliao87/albert-vscode-projects/issues">
-<img src="https://img.shields.io/github/issues/hankliao87/albert-vscode-projects.svg?style=flat-square" alt=""></a>
-<a href="https://github.com/hankliao87/albert-vscode-projects/blob/master/LICENSE.txt">
-<img src="https://img.shields.io/github/license/hankliao87/albert-vscode-projects.svg?style=flat-square" alt=""></a>
+<a href="https://github.com/hankhjliao/albert-vscode-projects/graphs/contributors">
+<img src="https://img.shields.io/github/contributors/hankhjliao/albert-vscode-projects.svg?style=flat-square" alt=""></a>
+<a href="https://github.com/hankhjliao/albert-vscode-projects/network/members">
+<img src="https://img.shields.io/github/forks/hankhjliao/albert-vscode-projects.svg?style=flat-square" alt=""></a>
+<a href="https://github.com/hankhjliao/albert-vscode-projects/stargazers">
+<img src="https://img.shields.io/github/stars/hankhjliao/albert-vscode-projects.svg?style=flat-square" alt=""></a>
+<a href="https://github.com/hankhjliao/albert-vscode-projects/issues">
+<img src="https://img.shields.io/github/issues/hankhjliao/albert-vscode-projects.svg?style=flat-square" alt=""></a>
+<a href="https://github.com/hankhjliao/albert-vscode-projects/blob/master/LICENSE.txt">
+<img src="https://img.shields.io/github/license/hankhjliao/albert-vscode-projects.svg?style=flat-square" alt=""></a>
 </p>
 
 </p>
@@ -22,7 +22,7 @@
 
 2. Clone this repository to `~/.local/share/albert/python/plugins`:
    ```
-   git clone https://github.com/hankliao87/albert-vscode-projects.git $HOME/.local/share/albert/python/plugins/albert-vscode-projects
+   git clone https://github.com/hankhjliao/albert-vscode-projects.git $HOME/.local/share/albert/python/plugins/albert-vscode-projects
    ```
 
 3. Enable `VS Code Projects` plugin in `albert settings - Plugins - Python`
@@ -39,7 +39,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ## Contact
 
-Project Link: [https://github.com/hankliao87/albert-vscode-projects](https://github.com/hankliao87/albert-vscode-projects)  
+Project Link: [https://github.com/hankhjliao/albert-vscode-projects](https://github.com/hankhjliao/albert-vscode-projects)  
 Base on:
 - https://github.com/mqus/jetbrains-albert-plugin
 - https://github.com/Sharsie/albertlauncher-vscode-projects
